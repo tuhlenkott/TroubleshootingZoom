@@ -1,0 +1,726 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="An illustrated, plain-language guide to fixing frozen and dropped Zoom calls on AT&amp;T Fiber Wi-Fi with a Dell laptop.">
+<title>Fixing Zoom on Wi-Fi</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+/* Layout: one calm reading column; each fix is a step with a picture beside (or above, on phones) the instructions. */
+:root{
+  --bg:#f5f8fa; --surface:#ffffff; --fg:#14283a; --muted:#4f6474; --line:#cfdbe3;
+  --accent:#0d7c86; --accent-soft:#dff1f2; --warn:#a85d00; --warn-soft:#fdf0dc;
+  --good:#2f7d3a; --good-soft:#e3f3e5; --bad:#b3362c; --bad-soft:#fbe6e3;
+  --screen:#eef3f6; --ink:#14283a;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1a22; --surface:#16242f; --fg:#e4edf2; --muted:#9db1be; --line:#2c3f4d;
+  --accent:#4cc3cc; --accent-soft:#163a40; --warn:#f0b45c; --warn-soft:#3a2c17;
+  --good:#7bcf86; --good-soft:#1b3420; --bad:#f08a80; --bad-soft:#3d1f1c;
+  --screen:#1d2f3c; --ink:#e4edf2; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#0f1a22; --surface:#16242f; --fg:#e4edf2; --muted:#9db1be; --line:#2c3f4d;
+  --accent:#4cc3cc; --accent-soft:#163a40; --warn:#f0b45c; --warn-soft:#3a2c17;
+  --good:#7bcf86; --good-soft:#1b3420; --bad:#f08a80; --bad-soft:#3d1f1c;
+  --screen:#1d2f3c; --ink:#e4edf2; color-scheme:dark;}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:1.125rem;line-height:1.6;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:0 4rem}
+.wrap{max-width:52rem;margin:0 auto}
+h1,h2,h3{font-family:var(--display);line-height:1.15;text-wrap:balance;margin:0}
+h1{font-size:clamp(2rem,6vw,3rem);font-weight:800;letter-spacing:-.01em}
+h2{font-size:clamp(1.5rem,4vw,2rem);font-weight:800}
+h3{font-size:1.25rem;font-weight:600}
+p{margin:0}
+a{color:var(--accent);text-underline-offset:3px}
+a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:4px}
+.eyebrow{font-size:.85rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.stack{display:flex;flex-direction:column;gap:1rem}
+.muted{color:var(--muted)}
+strong{font-weight:700}
+.path{font-weight:700;background:var(--screen);border:1px solid var(--line);border-radius:6px;padding:.05em .4em;white-space:normal}
+
+header.hero{padding-block:3rem 2rem;display:flex;flex-direction:column;gap:1.25rem;max-width:44rem}
+.hero .lead{font-size:1.3rem;color:var(--muted)}
+
+.callout{border-radius:14px;padding:1.25rem 1.4rem;display:flex;flex-direction:column;gap:.6rem}
+.callout.info{background:var(--accent-soft)}
+.callout.warn{background:var(--warn-soft)}
+.callout.good{background:var(--good-soft)}
+.callout h3{font-size:1.15rem}
+
+section{padding-block:2.5rem 0;display:flex;flex-direction:column;gap:1.25rem}
+
+/* the "why" picture */
+.figure{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:1rem;overflow-x:auto}
+.figure svg{display:block;width:100%;height:auto;min-width:300px}
+.cap{font-size:.95rem;color:var(--muted);margin-top:.5rem}
+
+/* checklist */
+.checklist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.5rem}
+.checklist label{display:flex;gap:.85rem;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:.85rem 1rem;cursor:pointer}
+.checklist input{width:1.5rem;height:1.5rem;flex:none;margin-top:.1rem;accent-color:var(--accent)}
+.checklist input:checked + span{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
+
+/* steps */
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1.5rem;counter-reset:step}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:1.5rem;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1.5rem;align-items:start}
+.step .text{display:flex;flex-direction:column;gap:.85rem;min-width:0}
+.step .pic{min-width:0;background:var(--screen);border-radius:12px;padding:.75rem}
+.step .pic svg{display:block;width:100%;height:auto}
+.num{display:flex;align-items:center;gap:.75rem}
+.num b{font-family:var(--display);font-weight:800;font-size:1.1rem;width:2.4rem;height:2.4rem;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--surface);flex:none}
+.time{font-size:.85rem;color:var(--muted);font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.step ol, .step ul{margin:0;padding-left:1.3rem;display:flex;flex-direction:column;gap:.4rem}
+.done-row{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:.85rem;font-size:1rem}
+.done-row label{display:flex;gap:.5rem;align-items:center;cursor:pointer;font-weight:700}
+.done-row input{width:1.3rem;height:1.3rem;accent-color:var(--good)}
+.step.is-done{border-color:var(--good)}
+.tag{font-size:.8rem;font-weight:700;padding:.15rem .55rem;border-radius:999px;background:var(--good-soft);color:var(--good)}
+.tag.big{background:var(--warn-soft);color:var(--warn)}
+@media (max-width:700px){.step{grid-template-columns:1fr}.step .pic{order:-1}}
+
+/* device picks */
+.picks{display:grid;grid-template-columns:1fr;gap:.6rem}
+.pick{border:1px solid var(--line);border-radius:12px;padding:.85rem 1rem;display:flex;flex-direction:column;gap:.3rem;background:var(--bg)}
+.pick h4{margin:0;font-family:var(--display);font-weight:600;font-size:1.05rem}
+.pick p{font-size:1rem;color:var(--muted)}
+.pick-tag{font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+
+/* numbers table */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:480px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:.7rem 1rem;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+th{font-size:.85rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.pill{display:inline-block;font-weight:700;border-radius:999px;padding:.05rem .6rem;font-size:.95rem}
+.pill.g{background:var(--good-soft);color:var(--good)}
+.pill.w{background:var(--warn-soft);color:var(--warn)}
+.pill.b{background:var(--bad-soft);color:var(--bad)}
+
+/* results form */
+.form{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:1.5rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:1rem}
+.field{display:flex;flex-direction:column;gap:.35rem;min-width:0}
+.field label{font-weight:700;font-size:1rem}
+.field input, .field select, textarea{font:inherit;font-size:1rem;padding:.6rem .75rem;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--fg);width:100%}
+.field.full{grid-column:1/-1}
+.btns{display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;grid-column:1/-1}
+button{font:inherit;font-weight:700;font-size:1.05rem;border:0;border-radius:12px;padding:.8rem 1.3rem;background:var(--accent);color:var(--surface);cursor:pointer}
+button.ghost{background:transparent;color:var(--accent);border:2px solid var(--accent)}
+#copyMsg{font-weight:700;color:var(--good)}
+textarea{min-height:9rem;resize:vertical;font-family:var(--body)}
+
+details{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:1rem 1.25rem}
+details + details{margin-top:.75rem}
+summary{cursor:pointer;font-weight:700;font-family:var(--display);font-size:1.15rem}
+details .stack{margin-top:1rem}
+details ul{margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:.5rem}
+.phone{font-family:var(--display);font-weight:800;font-size:1.4rem;user-select:all}
+
+/* svg helpers */
+.s-line{stroke:var(--ink);fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.s-thin{stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round}
+.f-surface{fill:var(--surface)} .f-screen{fill:var(--screen)} .f-accent{fill:var(--accent)} .f-ink{fill:var(--ink)}
+.f-good{fill:var(--good)} .f-bad{fill:var(--bad)} .f-warn{fill:var(--warn)} .f-muted{fill:var(--muted)} .f-line{fill:var(--line)}
+.f-goodsoft{fill:var(--good-soft)} .f-badsoft{fill:var(--bad-soft)} .f-accentsoft{fill:var(--accent-soft)}
+.st-accent{stroke:var(--accent)} .st-good{stroke:var(--good)} .st-bad{stroke:var(--bad)} .st-line{stroke:var(--line)}
+svg text{font-family:var(--body);fill:var(--ink)}
+svg .t-muted{fill:var(--muted)}
+svg .t-bold{font-weight:700}
+@media (prefers-reduced-motion:no-preference){.step{transition:border-color .2s}}
+</style>
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<header class="hero">
+  <span class="eyebrow">A step-by-step guide · about 30–45 minutes</span>
+  <h1>Let's fix your Zoom calls</h1>
+  <p class="lead">Your internet is fast. Your speed test showed about 250 Mbps, and a Zoom video call needs less than 4. So the problem is almost certainly not your AT&amp;T plan. It's usually the short trip between your laptop and your Wi-Fi box. This guide walks you through the fixes, easiest first.</p>
+  <div class="callout info">
+    <h3>You don't need to be technical for this.</h3>
+    <p>Each step tells you exactly what to click. Tick the box at the bottom of each step when you've done it. This page remembers your ticks on this computer, so you can stop and come back.</p>
+  </div>
+</header>
+
+<section aria-labelledby="why">
+  <span class="eyebrow">Why this happens</span>
+  <h2 id="why">Fast isn't the same as steady</h2>
+  <p>A speed test is like measuring how wide a road is. Zoom cares about whether the road has potholes. A video call sends tiny bits of sound and picture every split second. If even a few bits arrive late or get lost, your voice cuts out or the picture freezes, even on a very fast connection.</p>
+  <div class="figure" role="img" aria-label="Two lines over time. The top line is jumpy with gaps, labelled what Zoom sees on weak Wi-Fi. The bottom line is smooth, labelled what Zoom needs.">
+    <svg viewBox="0 0 640 230" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="640" height="230" rx="10" class="f-surface"/>
+      <text x="20" y="32" class="t-bold" font-size="17">Weak or crowded Wi-Fi</text>
+      <text x="620" y="32" text-anchor="end" font-size="15" class="t-muted">sound cuts out, picture freezes</text>
+      <polyline class="s-line st-bad" points="20,80 60,72 90,88 110,60 130,95 150,70 170,74 185,110 200,110 215,66 250,80 280,58 300,100 320,100 335,70 370,82 400,64 420,92 440,76 470,104 485,104 500,62 540,80 580,70 620,78"/>
+      <circle cx="192" cy="110" r="6" class="f-bad"/><circle cx="327" cy="100" r="6" class="f-bad"/><circle cx="478" cy="104" r="6" class="f-bad"/>
+      <line x1="20" y1="125" x2="620" y2="125" class="s-thin st-line"/>
+      <text x="20" y="160" class="t-bold" font-size="17">Strong Wi-Fi or a cable</text>
+      <text x="620" y="160" text-anchor="end" font-size="15" class="t-muted">smooth, clear call</text>
+      <polyline class="s-line st-good" points="20,195 120,193 220,196 320,194 420,195 520,193 620,195"/>
+      <text x="320" y="222" text-anchor="middle" font-size="14" class="t-muted">time during your call →   (red dots = lost bits of sound or video)</text>
+    </svg>
+  </div>
+  <p>The most common causes, roughly in order: <strong>being too far from the Wi-Fi box</strong> (or having walls, floors or appliances in the way), <strong>the router needing a restart</strong>, <strong>the laptop saving battery by weakening its Wi-Fi</strong>, and <strong>other things using the internet at the same time</strong>.</p>
+</section>
+
+<section aria-labelledby="before">
+  <span class="eyebrow">Do this before every important call</span>
+  <h2 id="before">The 2-minute pre-call checklist</h2>
+  <p class="muted">Even after everything is fixed, these habits keep calls reliable.</p>
+  <ul class="checklist" id="precall">
+    <li><label><input type="checkbox" id="pc1"><span><strong>Plug in your laptop charger.</strong> Laptops on battery often turn down Wi-Fi power to save energy.</span></label></li>
+    <li><label><input type="checkbox" id="pc2"><span><strong>Restart the laptop</strong> once at the start of your work day (Start button → Power → <em>Restart</em>, not Shut down).</span></label></li>
+    <li><label><input type="checkbox" id="pc3"><span><strong>Close anything you don't need:</strong> extra browser tabs, YouTube, music streaming, big downloads.</span></label></li>
+    <li><label><input type="checkbox" id="pc4"><span><strong>Use the Zoom app,</strong> not Zoom in a web browser. The app handles a shaky connection much better.</span></label></li>
+    <li><label><input type="checkbox" id="pc5"><span><strong>Sit where your Wi-Fi is strongest</strong> (Step 3 shows how to check), or use a cable (Step 8).</span></label></li>
+    <li><label><input type="checkbox" id="pc6"><span><strong>Ask others at home</strong> to pause gaming, movie downloads or video uploads during important calls.</span></label></li>
+  </ul>
+  <button class="ghost" type="button" id="resetPre" style="align-self:flex-start">Clear the checklist for next time</button>
+</section>
+
+<section aria-labelledby="fix">
+  <span class="eyebrow">The fixes</span>
+  <h2 id="fix">Work through these in order</h2>
+  <p>Do one step, then try a Zoom call (or the free test call at <a href="https://zoom.us/test" target="_blank" rel="noopener">zoom.us/test</a>). If the problem is gone, you can stop. If not, move to the next step.</p>
+
+  <ol class="steps">
+
+    <!-- STEP 1 -->
+    <li class="step" id="s1">
+      <div class="text">
+        <div class="num"><b>1</b><div><h3>Restart the AT&amp;T Wi-Fi box</h3><span class="time">5 minutes · easy</span></div></div>
+        <p>Routers run all day, every day, and slowly get "tired." A restart clears that out.</p>
+        <ol>
+          <li>Find the AT&amp;T box (called a <strong>gateway</strong>). It's usually black with a few small lights on the front.</li>
+          <li><strong>Unplug its power cord</strong> from the wall or from the back of the box.</li>
+          <li><strong>Wait a full 60 seconds.</strong></li>
+          <li>Plug it back in. Wait <strong>about 5 minutes</strong> until the lights stop blinking and stay steady.</li>
+          <li>Restart your laptop too.</li>
+        </ol>
+        <div class="callout warn"><p><strong>Don't press any tiny "Reset" hole</strong> with a pin. That erases the Wi-Fi name and password. Unplugging is all you need.</p></div>
+        <p class="muted">If a light is <strong>red</strong> after 10 minutes, call AT&amp;T (number at the bottom of this page).</p>
+        <div class="done-row"><label><input type="checkbox" data-step="s1" id="d1"> I did this step</label></div>
+      </div>
+      <div class="pic" role="img" aria-label="Drawing of a router with its power plug pulled out and a timer showing 60 seconds.">
+        <svg viewBox="0 0 320 260" xmlns="http://www.w3.org/2000/svg">
+          <rect x="60" y="40" width="110" height="170" rx="16" class="f-ink"/>
+          <rect x="72" y="52" width="86" height="146" rx="10" fill="none" class="st-line" stroke-width="2" opacity=".35"/>
+          <circle cx="90" cy="180" r="5" class="f-good"/><circle cx="108" cy="180" r="5" class="f-good"/><circle cx="126" cy="180" r="5" class="f-good"/><circle cx="144" cy="180" r="5" class="f-muted"/>
+          <text x="115" y="110" text-anchor="middle" font-size="15" class="t-bold" style="fill:var(--surface)">AT&amp;T</text>
+          <path d="M170 170 C200 170 205 215 235 215" class="s-line"/>
+          <rect x="232" y="203" width="28" height="24" rx="4" class="f-muted"/>
+          <rect x="262" y="208" width="10" height="4" class="f-muted"/><rect x="262" y="218" width="10" height="4" class="f-muted"/>
+          <path d="M282 196 l14 -10 M284 215 h18 M282 234 l14 10" class="s-line st-accent"/>
+          <circle cx="250" cy="85" r="46" class="f-surface"/>
+          <circle cx="250" cy="85" r="46" fill="none" class="st-accent" stroke-width="6"/>
+          <path d="M250 85 V55 M250 85 L270 98" class="s-line"/>
+          <text x="250" y="152" text-anchor="middle" font-size="18" class="t-bold">wait 60 sec</text>
+          <text x="115" y="240" text-anchor="middle" font-size="14" class="t-muted">unplug, wait, plug back in</text>
+        </svg>
+      </div>
+    </li>
+
+    <!-- STEP 2 -->
+    <li class="step" id="s2">
+      <div class="text">
+        <div class="num"><b>2</b><div><h3>Plug in the charger and turn off battery saving</h3><span class="time">2 minutes · easy</span></div></div>
+        <p>On battery, Windows quietly turns down power to the Wi-Fi to make the battery last. That alone can cause dropouts.</p>
+        <ol>
+          <li><strong>Plug in the charger.</strong></li>
+          <li>Click the <strong>Start</strong> button (the Windows logo at the bottom of the screen), then click <strong>Settings</strong> (the gear).</li>
+          <li>Click <span class="path">System</span>, then <span class="path">Power &amp; battery</span>.</li>
+          <li>Find <strong>Power mode</strong> and choose <span class="path">Best performance</span>.</li>
+          <li>If you see <strong>Energy saver</strong> (or Battery saver), make sure it's <strong>Off</strong>.</li>
+        </ol>
+        <p class="muted">Your screen may look a little different. Look for the same words.</p>
+        <div class="done-row"><label><input type="checkbox" data-step="s2" id="d2"> I did this step</label></div>
+      </div>
+      <div class="pic" role="img" aria-label="Mock-up of the Windows Power and battery settings page with Power mode set to Best performance and Energy saver off.">
+        <svg viewBox="0 0 320 260" xmlns="http://www.w3.org/2000/svg">
+          <rect x="10" y="10" width="300" height="240" rx="10" class="f-surface"/>
+          <text x="26" y="40" font-size="13" class="t-muted">System  ›</text>
+          <text x="26" y="64" font-size="20" class="t-bold">Power &amp; battery</text>
+          <rect x="26" y="84" width="268" height="62" rx="8" class="f-screen"/>
+          <text x="40" y="110" font-size="15" class="t-bold">Power mode</text>
+          <text x="40" y="130" font-size="12" class="t-muted">Optimize for performance</text>
+          <rect x="176" y="100" width="108" height="30" rx="6" class="f-surface" stroke="var(--accent)" stroke-width="3"/>
+          <text x="186" y="120" font-size="12" class="t-bold">Best performance</text>
+          <rect x="26" y="156" width="268" height="62" rx="8" class="f-screen"/>
+          <text x="40" y="182" font-size="15" class="t-bold">Energy saver</text>
+          <text x="40" y="202" font-size="12" class="t-muted">Extends battery life</text>
+          <text x="218" y="192" font-size="13" class="t-muted">Off</text>
+          <rect x="244" y="176" width="40" height="22" rx="11" fill="none" stroke="var(--muted)" stroke-width="2"/>
+          <circle cx="256" cy="187" r="6" class="f-muted"/>
+          <path d="M150 115 L168 115 M160 107 L168 115 L160 123" class="s-line st-accent"/>
+          <text x="160" y="240" text-anchor="middle" font-size="13" class="t-muted">choose "Best performance"</text>
+        </svg>
+      </div>
+    </li>
+
+    <!-- STEP 3 -->
+    <li class="step" id="s3">
+      <div class="text">
+        <div class="num"><b>3</b><div><h3>Check your Wi-Fi signal where you work</h3><span class="time">5 minutes · easy</span></div></div>
+        <p>Look at the <strong>Wi-Fi symbol</strong> at the bottom-right of the screen, next to the clock. The more curved bars that are filled in, the stronger your signal.</p>
+        <ul>
+          <li><strong>All bars filled:</strong> great.</li>
+          <li><strong>Only 1 or 2 bars:</strong> this is very likely your problem. Go to Step 4.</li>
+        </ul>
+        <p><strong>Try this test:</strong> carry the laptop into the same room as the AT&amp;T box and join the Zoom test call at <a href="https://zoom.us/test" target="_blank" rel="noopener">zoom.us/test</a>. If it works well there but badly at your desk, distance or walls are the cause.</p>
+        <div class="done-row"><label><input type="checkbox" data-step="s3" id="d3"> I did this step</label></div>
+      </div>
+      <div class="pic" role="img" aria-label="Two Wi-Fi symbols. The left one has all bars filled and is labelled good. The right one has only one bar filled and is labelled weak.">
+        <svg viewBox="0 0 320 260" xmlns="http://www.w3.org/2000/svg">
+          <rect x="10" y="190" width="300" height="50" rx="8" class="f-surface"/>
+          <text x="282" y="221" text-anchor="end" font-size="14" class="t-bold">10:42 AM</text>
+          <g transform="translate(196 228)"><path d="M0 0 m-14 -14 a20 20 0 0 1 28 0" class="s-line" stroke-width="3"/><path d="M-8 -8 a11 11 0 0 1 16 0" class="s-line" stroke-width="3"/><circle cx="0" cy="-2" r="2.5" class="f-ink"/></g>
+          <circle cx="196" cy="214" r="22" fill="none" class="st-accent" stroke-width="3"/>
+          <g transform="translate(90 120)">
+            <path d="M-48 -26 a68 68 0 0 1 96 0" class="s-line st-good" stroke-width="9"/>
+            <path d="M-32 -10 a45 45 0 0 1 64 0" class="s-line st-good" stroke-width="9"/>
+            <path d="M-16 6 a23 23 0 0 1 32 0" class="s-line st-good" stroke-width="9"/>
+            <circle cx="0" cy="20" r="6" class="f-good"/>
+          </g>
+          <text x="90" y="170" text-anchor="middle" font-size="16" class="t-bold">Good</text>
+          <g transform="translate(230 120)">
+            <path d="M-48 -26 a68 68 0 0 1 96 0" class="s-line st-line" stroke-width="9"/>
+            <path d="M-32 -10 a45 45 0 0 1 64 0" class="s-line st-line" stroke-width="9"/>
+            <path d="M-16 6 a23 23 0 0 1 32 0" class="s-line st-bad" stroke-width="9"/>
+            <circle cx="0" cy="20" r="6" class="f-bad"/>
+          </g>
+          <text x="230" y="170" text-anchor="middle" font-size="16" class="t-bold">Weak</text>
+          <text x="160" y="30" text-anchor="middle" font-size="14" class="t-muted">look near the clock ↓</text>
+        </svg>
+      </div>
+    </li>
+
+    <!-- STEP 4 -->
+    <li class="step" id="s4">
+      <div class="text">
+        <div class="num"><b>4</b><div><h3>Help the Wi-Fi reach you</h3><span class="time">10–15 minutes · easy</span></div></div>
+        <p>Wi-Fi is like a lamp's light: it gets dimmer through walls and floors, and some things block it badly.</p>
+        <ul>
+          <li><strong>Move the AT&amp;T box out in the open</strong>, up high (on a shelf, not the floor), and not inside a cabinet, closet or behind the TV.</li>
+          <li><strong>Keep it away from</strong> microwaves, cordless phone bases, fish tanks, mirrors and large metal things like filing cabinets.</li>
+          <li><strong>Or move your work spot</strong> closer, ideally in the same room or one wall away.</li>
+        </ul>
+        <p class="muted">The AT&amp;T box can only move as far as its cables reach. If you can't move it or your desk, Step 8 (a cable) or Step 9 (a mesh system) will solve it.</p>
+        <div class="done-row"><label><input type="checkbox" data-step="s4" id="d4"> I did this step</label></div>
+      </div>
+      <div class="pic" role="img" aria-label="Floor plan of a home. The router is in the center of the home on a shelf, with the laptop one room away. Crossed-out items show a router hidden in a cabinet and a microwave nearby.">
+        <svg viewBox="0 0 320 260" xmlns="http://www.w3.org/2000/svg">
+          <rect x="14" y="14" width="292" height="200" rx="6" class="f-surface" stroke="var(--ink)" stroke-width="4"/>
+          <line x1="160" y1="14" x2="160" y2="90" stroke="var(--ink)" stroke-width="4"/>
+          <line x1="160" y1="130" x2="160" y2="214" stroke="var(--ink)" stroke-width="4"/>
+          <line x1="14" y1="120" x2="110" y2="120" stroke="var(--ink)" stroke-width="4"/>
+          <circle cx="160" cy="110" r="70" class="f-accentsoft" opacity=".8"/>
+          <circle cx="160" cy="110" r="40" class="f-accentsoft"/>
+          <rect x="148" y="96" width="24" height="30" rx="4" class="f-ink"/>
+          <circle cx="160" cy="118" r="3" class="f-good"/>
+          <text x="160" y="150" text-anchor="middle" font-size="12" class="t-bold">box: central, up high</text>
+          <rect x="214" y="96" width="38" height="24" rx="3" class="f-screen" stroke="var(--ink)" stroke-width="2.5"/>
+          <rect x="208" y="120" width="50" height="5" rx="2" class="f-ink"/>
+          <text x="233" y="142" text-anchor="middle" font-size="12" class="t-bold">you</text>
+          <rect x="30" y="160" width="44" height="40" rx="3" fill="none" stroke="var(--muted)" stroke-width="2.5"/>
+          <text x="52" y="152" text-anchor="middle" font-size="11" class="t-muted">cabinet</text>
+          <path d="M34 164 L70 196 M70 164 L34 196" class="s-line st-bad"/>
+          <rect x="30" y="34" width="44" height="30" rx="4" fill="none" stroke="var(--muted)" stroke-width="2.5"/>
+          <text x="52" y="80" text-anchor="middle" font-size="11" class="t-muted">microwave</text>
+          <path d="M34 36 L70 62 M70 36 L34 62" class="s-line st-bad"/>
+          <text x="160" y="240" text-anchor="middle" font-size="13" class="t-muted">open, central, high = stronger signal</text>
+        </svg>
+      </div>
+    </li>
+
+    <!-- STEP 5 -->
+    <li class="step" id="s5">
+      <div class="text">
+        <div class="num"><b>5</b><div><h3>Update Zoom and lighten its load</h3><span class="time">10 minutes · easy</span></div></div>
+        <p><strong>Update Zoom:</strong> open the Zoom app, click your <strong>picture or initials</strong> in the top-right corner, then click <span class="path">Check for updates</span>. Install anything it finds.</p>
+        <p><strong>Make video lighter:</strong> click your picture → <span class="path">Settings</span> → <span class="path">Video</span> (or "Video &amp; effects"):</p>
+        <ul>
+          <li>Untick <strong>HD</strong>. People will still see you clearly.</li>
+          <li>If you use a <strong>virtual background</strong> or blur, try turning it to <strong>None</strong>. These work the laptop hard.</li>
+        </ul>
+        <p><strong>During a bad call:</strong> turning your camera off for a minute often brings the sound right back.</p>
+        <p class="muted">If your work requires a <strong>VPN</strong> (a program that connects you to the office network), ask IT whether Zoom should go through it. A VPN often causes exactly these problems.</p>
+        <div class="done-row"><label><input type="checkbox" data-step="s5" id="d5"> I did this step</label></div>
+      </div>
+      <div class="pic" role="img" aria-label="Mock-up of Zoom video settings with the HD box unticked.">
+        <svg viewBox="0 0 320 260" xmlns="http://www.w3.org/2000/svg">
+          <rect x="10" y="10" width="300" height="240" rx="10" class="f-surface"/>
+          <rect x="10" y="10" width="92" height="240" rx="10" class="f-screen"/>
+          <text x="22" y="44" font-size="12" class="t-muted">General</text>
+          <rect x="16" y="56" width="80" height="26" rx="6" class="f-accentsoft"/>
+          <text x="22" y="74" font-size="12" class="t-bold">Video</text>
+          <text x="22" y="104" font-size="12" class="t-muted">Audio</text>
+          <text x="22" y="134" font-size="12" class="t-muted">Backgrounds</text>
+          <text x="22" y="164" font-size="12" class="t-muted">Statistics</text>
+          <text x="116" y="42" font-size="16" class="t-bold">Video</text>
+          <rect x="116" y="54" width="180" height="92" rx="8" class="f-screen"/>
+          <circle cx="206" cy="88" r="16" class="f-line"/><path d="M178 140 a28 24 0 0 1 56 0" class="f-line"/>
+          <rect x="116" y="166" width="22" height="22" rx="4" class="f-surface" stroke="var(--accent)" stroke-width="3"/>
+          <text x="148" y="183" font-size="15" class="t-bold">HD</text>
+          <text x="178" y="183" font-size="13" class="t-muted">← untick</text>
+          <rect x="116" y="200" width="22" height="22" rx="4" class="f-surface" stroke="var(--muted)" stroke-width="2"/>
+          <path d="M120 211 l5 5 l9 -10" class="s-line" stroke-width="2.5"/>
+          <text x="148" y="216" font-size="13">Mirror my video</text>
+        </svg>
+      </div>
+    </li>
+
+    <!-- STEP 6 -->
+    <li class="step" id="s6">
+      <div class="text">
+        <div class="num"><b>6</b><div><h3>Update the laptop's Wi-Fi software</h3><span class="time">15–30 minutes · mostly waiting</span></div></div>
+        <p>Dell laptops come with an app that installs fixes for the Wi-Fi and other parts. Out-of-date Wi-Fi software is a common cause of dropouts on newer laptops.</p>
+        <ol>
+          <li>Click <strong>Start</strong> and type <strong>SupportAssist</strong> (or <strong>Dell Command Update</strong>). Open it.</li>
+          <li>Click <span class="path">Check for updates</span> (sometimes called "Get drivers &amp; downloads"). Install everything it offers.</li>
+          <li>Next, open <strong>Settings</strong> → <span class="path">Windows Update</span> → <span class="path">Check for updates</span>. Install updates, then click <span class="path">Advanced options</span> → <span class="path">Optional updates</span> and install any listed under "Driver updates."</li>
+          <li><strong>Restart</strong> the laptop when asked.</li>
+        </ol>
+        <div class="callout warn"><p>Do this <strong>after work hours</strong>. Updates can take a while and need a restart.</p></div>
+        <div class="done-row"><label><input type="checkbox" data-step="s6" id="d6"> I did this step</label></div>
+      </div>
+      <div class="pic" role="img" aria-label="Mock-up of an update app showing a Check for updates button and a list with a Wi-Fi driver update.">
+        <svg viewBox="0 0 320 260" xmlns="http://www.w3.org/2000/svg">
+          <rect x="10" y="10" width="300" height="240" rx="10" class="f-surface"/>
+          <text x="28" y="44" font-size="17" class="t-bold">Updates for your Dell</text>
+          <rect x="28" y="60" width="160" height="38" rx="8" class="f-accent"/>
+          <text x="108" y="84" text-anchor="middle" font-size="14" class="t-bold" style="fill:var(--surface)">Check for updates</text>
+          <rect x="28" y="116" width="264" height="44" rx="8" class="f-screen"/>
+          <text x="42" y="136" font-size="13" class="t-bold">Wi-Fi (Wireless) driver</text>
+          <text x="42" y="152" font-size="11" class="t-muted">Recommended</text>
+          <rect x="226" y="126" width="54" height="24" rx="6" class="f-goodsoft"/>
+          <text x="253" y="143" text-anchor="middle" font-size="12" class="t-bold" style="fill:var(--good)">Install</text>
+          <rect x="28" y="170" width="264" height="44" rx="8" class="f-screen"/>
+          <text x="42" y="190" font-size="13" class="t-bold">BIOS update</text>
+          <text x="42" y="206" font-size="11" class="t-muted">Recommended</text>
+          <rect x="226" y="180" width="54" height="24" rx="6" class="f-goodsoft"/>
+          <text x="253" y="197" text-anchor="middle" font-size="12" class="t-bold" style="fill:var(--good)">Install</text>
+          <text x="160" y="240" text-anchor="middle" font-size="13" class="t-muted">install everything offered, then restart</text>
+        </svg>
+      </div>
+    </li>
+
+    <!-- STEP 7: channel -->
+    <li class="step" id="s8">
+      <div class="text">
+        <div class="num"><b>7</b><div><h3>Move to a quieter Wi-Fi channel</h3><span class="time">20 minutes · a little more involved</span></div></div>
+        <p>Your Wi-Fi talks on a "channel," like a lane on a highway. If several neighbors' Wi-Fi uses the same lane, everyone gets in each other's way. This happens a lot in apartments, condos and close-together homes.</p>
+        <p><strong>Part A: see which channels your neighbors use</strong></p>
+        <ol>
+          <li>Click <strong>Start</strong>, type <strong>Microsoft Store</strong> and open it.</li>
+          <li>Search for <strong>WiFi Analyzer</strong> and install the free one (a blue icon). Open it at your desk.</li>
+          <li>Open the <strong>Analyze</strong> tab. Each hump is a nearby Wi-Fi network. Look for the channel with the <strong>fewest and smallest humps</strong>. Check both <strong>2.4 GHz</strong> and <strong>5 GHz</strong>.</li>
+        </ol>
+        <p><strong>Part B: change your channel</strong></p>
+        <ol>
+          <li>Find the <strong>Device Access Code</strong> on the sticker on the side or bottom of the AT&amp;T box. Write it down.</li>
+          <li>On the laptop, open your web browser, click the address bar at the very top, type <span class="path">192.168.1.254</span> and press <strong>Enter</strong>.</li>
+          <li>Click <span class="path">Home Network</span>, then <span class="path">Wi-Fi</span>, then <span class="path">Advanced Options</span>. Type the Device Access Code when asked.</li>
+          <li><strong>Before changing anything, take a photo of the screen with your phone.</strong> That way you can always put it back.</li>
+          <li>Under <strong>2.4 GHz</strong>, change <strong>Channel</strong> from Automatic to whichever of <strong>1, 6 or 11</strong> was least crowded. Only use those three.</li>
+          <li>Under <strong>5 GHz</strong>, pick the least crowded of <strong>36, 40, 44, 48, 149, 153, 157 or 161</strong>.</li>
+          <li>Scroll down and click <span class="path">Save</span>. Wi-Fi will drop for a minute and come back.</li>
+        </ol>
+        <div class="callout warn"><p><strong>Do this outside work hours.</strong> If anything goes wrong, set both channels back to <strong>Automatic</strong> (using your photo) or restart the box as in Step 1. Your Wi-Fi name and password won't change.</p></div>
+        <p class="muted">The screens may use slightly different words depending on your AT&amp;T box model. If you'd rather not do this part, your helper can walk you through it on the phone.</p>
+        <div class="done-row"><label><input type="checkbox" data-step="s8" id="d8"> I did this step</label></div>
+      </div>
+      <div class="pic" role="img" aria-label="Chart of 2.4 GHz Wi-Fi channels 1, 6 and 11. Channels 1 and 6 each have several neighbor networks stacked on them; channel 11 has only one, marked as the best choice.">
+        <svg viewBox="0 0 320 260" xmlns="http://www.w3.org/2000/svg">
+          <rect x="10" y="10" width="300" height="240" rx="10" class="f-surface"/>
+          <text x="26" y="38" font-size="15" class="t-bold">Neighbors' Wi-Fi (2.4 GHz)</text>
+          <line x1="30" y1="200" x2="290" y2="200" stroke="var(--ink)" stroke-width="2"/>
+          <path d="M40 200 Q75 70 110 200" fill="var(--bad)" opacity=".28"/>
+          <path d="M44 200 Q75 100 106 200" fill="var(--bad)" opacity=".28"/>
+          <path d="M48 200 Q75 130 102 200" fill="var(--bad)" opacity=".28"/>
+          <path d="M125 200 Q160 60 195 200" fill="var(--bad)" opacity=".28"/>
+          <path d="M129 200 Q160 110 191 200" fill="var(--bad)" opacity=".28"/>
+          <path d="M210 200 Q245 160 280 200" fill="var(--good)" opacity=".45"/>
+          <text x="75" y="220" text-anchor="middle" font-size="14" class="t-bold">1</text>
+          <text x="160" y="220" text-anchor="middle" font-size="14" class="t-bold">6</text>
+          <text x="245" y="220" text-anchor="middle" font-size="14" class="t-bold">11</text>
+          <text x="75" y="60" text-anchor="middle" font-size="12" class="t-muted">crowded</text>
+          <text x="160" y="52" text-anchor="middle" font-size="12" class="t-muted">crowded</text>
+          <text x="245" y="120" text-anchor="middle" font-size="13" class="t-bold" style="fill:var(--good)">pick this</text>
+          <path d="M245 128 V150 M238 143 L245 150 L252 143" class="s-line st-good"/>
+          <text x="160" y="242" text-anchor="middle" font-size="12" class="t-muted">channel number</text>
+        </svg>
+      </div>
+    </li>
+
+    <!-- STEP 8: cable -->
+    <li class="step" id="s7">
+      <div class="text">
+        <div class="num"><b>8</b><div><h3>The most reliable fix: use a cable</h3><span class="time">a one-time purchase · about $25</span></div></div>
+        <p><span class="tag big">Best fix for work calls</span></p>
+        <p>A cable from the AT&amp;T box to your laptop skips Wi-Fi completely. For anyone whose job depends on video calls, this is the gold standard. It usually fixes freezing and dropouts for good.</p>
+        <ol>
+          <li>Look at the sides of your laptop for a wide, squarish socket (like a phone jack, but bigger). Many newer Dells <strong>don't have one</strong>, and that's fine.</li>
+          <li>If not, buy a <strong>"USB-C to Ethernet adapter"</strong> (about $15–25 at Best Buy, Staples, Walmart or Amazon). It plugs into the small oval USB-C port on the laptop.</li>
+          <li>Buy an <strong>Ethernet cable</strong> long enough to reach your desk ("Cat 6", in a length like 25 or 50 feet).</li>
+          <li>Plug one end into any <strong>yellow or numbered port</strong> on the back of the AT&amp;T box, the other into the adapter.</li>
+        </ol>
+        <p class="muted">That's it. No settings needed. The laptop automatically uses the cable. If a cable can't reach your desk, Step 9 is the next-best option.</p>
+        <div class="done-row"><label><input type="checkbox" data-step="s7" id="d7"> I did this step</label></div>
+      </div>
+      <div class="pic" role="img" aria-label="Drawing of the AT&amp;T box connected with a cable to a small adapter that plugs into a laptop.">
+        <svg viewBox="0 0 320 260" xmlns="http://www.w3.org/2000/svg">
+          <rect x="20" y="40" width="70" height="120" rx="12" class="f-ink"/>
+          <rect x="34" y="128" width="16" height="12" rx="2" class="f-warn"/>
+          <rect x="56" y="128" width="16" height="12" rx="2" class="f-warn"/>
+          <text x="55" y="185" text-anchor="middle" font-size="12" class="t-bold">AT&amp;T box</text>
+          <text x="55" y="200" text-anchor="middle" font-size="11" class="t-muted">back, yellow port</text>
+          <path d="M42 140 C42 230 160 230 186 170" class="s-line st-accent" stroke-width="5"/>
+          <rect x="176" y="150" width="26" height="22" rx="4" class="f-muted"/>
+          <rect x="202" y="156" width="14" height="10" rx="2" class="f-muted"/>
+          <text x="190" y="196" text-anchor="middle" font-size="11" class="t-bold">adapter</text>
+          <path d="M216 161 H228" class="s-line" stroke-width="4"/>
+          <rect x="228" y="78" width="78" height="56" rx="5" class="f-screen" stroke="var(--ink)" stroke-width="3"/>
+          <path d="M220 134 H314 L306 146 H228 Z" class="f-ink"/>
+          <rect x="228" y="154" width="8" height="12" rx="3" class="f-ink"/>
+          <text x="267" y="70" text-anchor="middle" font-size="12" class="t-bold">your laptop</text>
+          <text x="160" y="248" text-anchor="middle" font-size="13" class="t-muted">box → cable → adapter → laptop</text>
+        </svg>
+      </div>
+    </li>
+
+    <!-- STEP 9: mesh -->
+    <li class="step" id="s9">
+      <div class="text">
+        <div class="num"><b>9</b><div><h3>Add a mesh Wi-Fi system</h3><span class="time">a one-time purchase · about $80–200</span></div></div>
+        <p>If a cable won't reach and your Wi-Fi is weak at your desk, a <strong>mesh system</strong> helps. It's a set of 2 or 3 small boxes that work together like a relay team, carrying strong Wi-Fi to every room.</p>
+        <p><strong>Good, affordable options</strong> (prices are rough and change often):</p>
+        <div class="picks">
+          <div class="pick">
+            <span class="pick-tag">Simplest</span>
+            <h4>AT&amp;T Smart Wi-Fi Extender</h4>
+            <p>Made to work with your AT&amp;T box. Set up in the AT&amp;T Smart Home Manager app. Ask AT&amp;T about price; it's sometimes discounted or included.</p>
+          </div>
+          <div class="pick">
+            <span class="pick-tag">Best value</span>
+            <h4>TP-Link Deco (Wi-Fi 6), 2-pack</h4>
+            <p>Models like the Deco X20 or X55. Easy phone-app setup. Often about $80–150.</p>
+          </div>
+          <div class="pick">
+            <span class="pick-tag">Easiest app</span>
+            <h4>Amazon eero 6+, 2- or 3-pack</h4>
+            <p>Very simple app, good support. Often about $130–200, cheaper on sale.</p>
+          </div>
+        </div>
+        <ul>
+          <li>Look for <strong>"Wi-Fi 6"</strong> (or 6E or 7) on the box. Skip anything labelled only "Wi-Fi 5" or "AC".</li>
+          <li>A <strong>2-pack</strong> covers most homes. Choose a 3-pack for a large or multi-floor home.</li>
+          <li>Put the second box <strong>about halfway</strong> between the AT&amp;T box and your desk, out in the open. Not in your office itself.</li>
+        </ul>
+        <div class="callout info"><p><strong>Ask your helper before you buy</strong>, or buy from a store with easy returns. Your helper can do the setup over the phone. There are a couple of settings on the AT&amp;T box that work best when set up together.</p></div>
+        <p class="muted">Avoid the cheap plug-in "Wi-Fi booster" gadgets. They often make video calls worse, not better.</p>
+        <div class="done-row"><label><input type="checkbox" data-step="s9" id="d9"> I did this step</label></div>
+      </div>
+      <div class="pic" role="img" aria-label="Floor plan with the AT&amp;T box at one end, a mesh box halfway across the home, and the laptop at the far end, with Wi-Fi coverage overlapping all the way.">
+        <svg viewBox="0 0 320 260" xmlns="http://www.w3.org/2000/svg">
+          <rect x="14" y="30" width="292" height="170" rx="6" class="f-surface" stroke="var(--ink)" stroke-width="4"/>
+          <line x1="110" y1="30" x2="110" y2="100" stroke="var(--ink)" stroke-width="4"/>
+          <line x1="110" y1="140" x2="110" y2="200" stroke="var(--ink)" stroke-width="4"/>
+          <line x1="215" y1="30" x2="215" y2="90" stroke="var(--ink)" stroke-width="4"/>
+          <line x1="215" y1="130" x2="215" y2="200" stroke="var(--ink)" stroke-width="4"/>
+          <circle cx="55" cy="115" r="62" class="f-accentsoft" opacity=".9"/>
+          <circle cx="162" cy="115" r="62" class="f-accentsoft" opacity=".9"/>
+          <rect x="44" y="100" width="22" height="28" rx="4" class="f-ink"/>
+          <circle cx="55" cy="120" r="3" class="f-good"/>
+          <text x="55" y="152" text-anchor="middle" font-size="11" class="t-bold">AT&amp;T box</text>
+          <rect x="148" y="102" width="28" height="24" rx="10" class="f-accent"/>
+          <text x="162" y="152" text-anchor="middle" font-size="11" class="t-bold">mesh box</text>
+          <text x="162" y="166" text-anchor="middle" font-size="10" class="t-muted">halfway</text>
+          <rect x="246" y="100" width="38" height="24" rx="3" class="f-screen" stroke="var(--ink)" stroke-width="2.5"/>
+          <rect x="240" y="124" width="50" height="5" rx="2" class="f-ink"/>
+          <text x="265" y="148" text-anchor="middle" font-size="11" class="t-bold">your desk</text>
+          <path d="M70 70 q10 -10 20 0 M180 70 q10 -10 20 0" class="s-line st-accent" stroke-width="2.5"/>
+          <text x="160" y="232" text-anchor="middle" font-size="13" class="t-muted">the second box passes strong Wi-Fi along</text>
+        </svg>
+      </div>
+    </li>
+  </ol>
+</section>
+
+<section aria-labelledby="measure">
+  <span class="eyebrow">Find out if it's working</span>
+  <h2 id="measure">Check your connection's "steadiness" numbers</h2>
+  <p>Zoom can show you how steady your connection is. Do this <strong>at your normal desk</strong>, ideally while on a call or the test call at <a href="https://zoom.us/test" target="_blank" rel="noopener">zoom.us/test</a>.</p>
+  <ol style="margin:0;padding-left:1.3rem;display:flex;flex-direction:column;gap:.4rem">
+    <li>In the Zoom app, click your <strong>picture or initials</strong> (top-right) → <span class="path">Settings</span>.</li>
+    <li>Click <span class="path">Statistics</span> on the left, then the <strong>Network</strong> (or Overall) tab.</li>
+    <li>Write down the three numbers below.</li>
+  </ol>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Number</th><th>What it means</th><th>Good</th><th>Okay</th><th>Problem</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Latency</strong></td><td>How long a bit of sound takes to arrive</td><td><span class="pill g">under 100 ms</span></td><td><span class="pill w">100–150</span></td><td><span class="pill b">over 150</span></td></tr>
+        <tr><td><strong>Jitter</strong></td><td>How uneven the arrival times are</td><td><span class="pill g">under 30 ms</span></td><td><span class="pill w">30–40</span></td><td><span class="pill b">over 40</span></td></tr>
+        <tr><td><strong>Packet loss</strong></td><td>How much sound and video gets lost</td><td><span class="pill g">0–1%</span></td><td><span class="pill w">1–2%</span></td><td><span class="pill b">over 2%</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="muted">These are general rules of thumb, not official Zoom limits. "ms" means milliseconds (thousandths of a second).</p>
+  <div class="callout info">
+    <h3>One more free test (optional)</h3>
+    <p>Go to <a href="https://www.waveform.com/tools/bufferbloat" target="_blank" rel="noopener">waveform.com/tools/bufferbloat</a> and click <strong>Start Test</strong>. It gives a <strong>letter grade</strong>. An A or B is good. A C, D or F means the connection gets "jammed up" when it's busy, which causes exactly the freezing you're seeing.</p>
+  </div>
+</section>
+
+<section aria-labelledby="send">
+  <span class="eyebrow">Send these to your helper</span>
+  <h2 id="send">Share your results</h2>
+  <p>Fill in what you can, press <strong>Copy my results</strong>, then paste them into a text message or email to whoever is helping you.</p>
+  <form class="form" id="results">
+    <div class="field"><label for="r-bars">Wi-Fi bars at your desk</label>
+      <select id="r-bars"><option value="">Choose…</option><option>All bars (strong)</option><option>2 bars (medium)</option><option>1 bar (weak)</option><option>Using a cable</option></select></div>
+    <div class="field"><label for="r-lat">Zoom latency (ms)</label><input id="r-lat" inputmode="decimal" placeholder="e.g. 35"></div>
+    <div class="field"><label for="r-jit">Zoom jitter (ms)</label><input id="r-jit" inputmode="decimal" placeholder="e.g. 12"></div>
+    <div class="field"><label for="r-loss">Zoom packet loss (%)</label><input id="r-loss" inputmode="decimal" placeholder="e.g. 0.5"></div>
+    <div class="field"><label for="r-grade">Bufferbloat grade</label>
+      <select id="r-grade"><option value="">Didn't do it</option><option>A+</option><option>A</option><option>B</option><option>C</option><option>D</option><option>F</option></select></div>
+    <div class="field"><label for="r-near">Zoom test next to the AT&amp;T box</label>
+      <select id="r-near"><option value="">Didn't try</option><option>Worked well there</option><option>Still bad there too</option></select></div>
+    <div class="field full"><label for="r-notes">Anything else? (when it happens, what you see)</label>
+      <textarea id="r-notes" placeholder="e.g. Freezes most in the afternoon when my son is home. Audio cuts out every few minutes."></textarea></div>
+    <div class="btns">
+      <button type="submit" id="copyBtn">Copy my results</button>
+      <span id="copyMsg" role="status"></span>
+    </div>
+    <div class="field full" id="fallbackWrap" hidden><label for="fallback">Your results (select all of this text and copy it)</label><textarea id="fallback" readonly></textarea></div>
+  </form>
+</section>
+
+<section aria-labelledby="help">
+  <span class="eyebrow">Still having trouble?</span>
+  <h2 id="help">Who to call</h2>
+  <div class="callout good">
+    <p><strong>AT&amp;T Internet support:</strong> <span class="phone">1-800-288-2020</span></p>
+    <p>Tell them: <em>"My speed test is fine, but I'm getting freezing and dropped video calls over Wi-Fi. Can you check my gateway's Wi-Fi and the line for errors?"</em> You can also use the free <strong>AT&amp;T Smart Home Manager</strong> app on your phone to restart the box and see your Wi-Fi strength.</p>
+  </div>
+  <div class="callout info">
+    <p><strong>Your work's IT or help desk:</strong> if you use a VPN or a work-managed laptop, they can check whether their software is slowing Zoom down. Showing them your numbers from the table above helps a lot.</p>
+  </div>
+</section>
+
+<section aria-labelledby="tech">
+  <span class="eyebrow">For the person helping</span>
+  <h2 id="tech">Technical notes</h2>
+  <details>
+    <summary>What to look at in her results</summary>
+    <div class="stack">
+      <ul>
+        <li><strong>Good near the gateway, bad at the desk:</strong> RF coverage. Wired Ethernet via USB-C adapter, or an AT&amp;T Smart Wi-Fi Extender / mesh node in wired-backhaul mode if possible.</li>
+        <li><strong>Bad everywhere, even wired:</strong> line or gateway issue (ask AT&amp;T to check ONT/gateway logs), or VPN / endpoint security software on the laptop.</li>
+        <li><strong>Bufferbloat C or worse:</strong> upstream saturation from other devices (cloud backups, camera uploads, game downloads). AT&amp;T gateways have no SQM; a separate router with SQM/Smart Queue behind the gateway in IP Passthrough mode fixes it.</li>
+        <li><strong>Packet loss spikes but low latency:</strong> classic Wi-Fi retransmit or roaming issue. Check the adapter's band.</li>
+      </ul>
+    </div>
+  </details>
+  <details>
+    <summary>Laptop-side checks (Windows 11)</summary>
+    <div class="stack">
+      <ul>
+        <li><strong>Wi-Fi adapter power saving:</strong> Device Manager → Network adapters → the Intel/Killer/Realtek/Qualcomm Wi-Fi adapter → Power Management → untick "Allow the computer to turn off this device to save power." Under Advanced, set Roaming Aggressiveness to Lowest if present.</li>
+        <li><strong>Which band:</strong> Settings → Network &amp; internet → Wi-Fi → (network) properties shows Network band. 5 GHz (or 6 GHz) is what you want; 2.4 GHz at the desk is a red flag.</li>
+        <li><strong>Band steering:</strong> BGW-series gateways merge 2.4/5 GHz under one SSID. If the laptop keeps falling back to 2.4 GHz, split the bands at <span class="path">192.168.1.254</span> → Home Network → Wi-Fi (Advanced Options) and connect the laptop to the 5 GHz SSID only. Device access code is on the gateway's sticker.</li>
+        <li><strong>Killer Wi-Fi cards</strong> (some Dells): the Killer Control Center / Prioritization Engine has a history of causing call jitter. Use Dell's current driver and disable prioritization, or install the Intel driver-only package.</li>
+        <li><strong>Background traffic:</strong> OneDrive sync, Windows Update delivery optimization, backup agents. Pause OneDrive during calls; Settings → Windows Update → Advanced → Delivery Optimization → off.</li>
+        <li><strong>Last resort:</strong> Settings → Network &amp; internet → Advanced network settings → Network reset (she'll need to rejoin Wi-Fi afterwards).</li>
+      </ul>
+    </div>
+  </details>
+  <details>
+    <summary>Gateway-side checks</summary>
+    <div class="stack">
+      <ul>
+        <li>At <span class="path">192.168.1.254</span>: Broadband → Status for line errors; Home Network → Wi-Fi for channel. Avoid auto-picking a crowded channel; on 5 GHz prefer 80 MHz on a non-DFS channel (36–48 or 149–161) if DFS events are dropping clients.</li>
+        <li>Count connected devices in Smart Home Manager. Older 2.4 GHz-only devices can drag airtime down.</li>
+        <li>If the gateway is several years old or a BGW210, ask AT&amp;T about a swap to a current model.</li>
+        <li><strong>Channel choice:</strong> 2.4 GHz only 1/6/11 (overlap otherwise); 5 GHz non-DFS 36–48 or 149–161 avoids radar-triggered channel switches that drop clients for ~1 min. Keep 5 GHz at 80 MHz unless the area is very dense, then try 40 MHz. If Automatic picks well after a reboot, leaving it there is fine.</li>
+        <li><strong>Mesh setup:</strong> to avoid double NAT, either run the mesh in bridge/access-point mode (eero: "Bridge mode"; Deco: "Access Point mode") behind the gateway, or keep the mesh in router mode and set the gateway to IP Passthrough (Firewall → IP Passthrough, DHCPS-fixed to the mesh MAC). Then turn off the gateway's own Wi-Fi radios so devices don't cling to it. Wired backhaul between mesh nodes beats wireless if there's any way to run a cable.</li>
+      </ul>
+    </div>
+  </details>
+</section>
+
+</div>
+
+<script>
+(function(){
+  const KEY = 'zoomwifi-v1';
+  let state = {};
+  try { state = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch(e) { state = {}; }
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e) {} };
+
+  document.querySelectorAll('input[type=checkbox]').forEach(cb => {
+    if (state[cb.id]) cb.checked = true;
+    const sync = () => {
+      if (cb.dataset.step) document.getElementById(cb.dataset.step).classList.toggle('is-done', cb.checked);
+    };
+    sync();
+    cb.addEventListener('change', () => { state[cb.id] = cb.checked; save(); sync(); });
+  });
+
+  document.getElementById('resetPre').addEventListener('click', () => {
+    document.querySelectorAll('#precall input').forEach(cb => { cb.checked = false; state[cb.id] = false; });
+    save();
+  });
+
+  // remember the form fields too
+  const fields = ['r-bars','r-lat','r-jit','r-loss','r-grade','r-near','r-notes'];
+  fields.forEach(id => {
+    const el = document.getElementById(id);
+    if (state[id]) el.value = state[id];
+    el.addEventListener('input', () => { state[id] = el.value; save(); });
+  });
+
+  const stepNames = {d1:'Restarted AT&T box',d2:'Charger + Best performance',d3:'Checked Wi-Fi bars',d4:'Moved box / desk',d5:'Updated Zoom, HD off',d6:'Updated Dell drivers',d8:'Changed Wi-Fi channel',d7:'Using a cable',d9:'Added mesh Wi-Fi'};
+  function summary(){
+    const v = id => document.getElementById(id).value.trim();
+    const done = Object.keys(stepNames).filter(k => document.getElementById(k).checked).map(k => stepNames[k]);
+    return [
+      'My Zoom / Wi-Fi results',
+      'Wi-Fi bars at desk: ' + (v('r-bars') || 'not checked'),
+      'Zoom latency: ' + (v('r-lat') ? v('r-lat') + ' ms' : 'not checked'),
+      'Zoom jitter: ' + (v('r-jit') ? v('r-jit') + ' ms' : 'not checked'),
+      'Zoom packet loss: ' + (v('r-loss') ? v('r-loss') + '%' : 'not checked'),
+      'Bufferbloat grade: ' + (v('r-grade') || 'not done'),
+      'Test near AT&T box: ' + (v('r-near') || 'not tried'),
+      'Steps done: ' + (done.length ? done.join('; ') : 'none yet'),
+      v('r-notes') ? 'Notes: ' + v('r-notes') : ''
+    ].filter(Boolean).join('\n');
+  }
+  document.getElementById('results').addEventListener('submit', e => {
+    e.preventDefault();
+    const text = summary();
+    const msg = document.getElementById('copyMsg');
+    const fbWrap = document.getElementById('fallbackWrap');
+    const fb = document.getElementById('fallback');
+    const fallback = () => {
+      fb.value = text; fbWrap.hidden = false; fb.focus(); fb.select();
+      msg.textContent = 'Copy the text in the box below.';
+    };
+    try {
+      navigator.clipboard.writeText(text).then(() => {
+        msg.textContent = 'Copied. Now paste it into a text or email.';
+        fbWrap.hidden = true;
+      }, fallback);
+    } catch(err) { fallback(); }
+  });
+})();
+</script>
+</body>
+</html>
